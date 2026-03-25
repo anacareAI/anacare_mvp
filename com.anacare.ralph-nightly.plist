@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.anacare.ralph-nightly</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/joshuakao/anacare_03.20/ralph-nightly.sh</string>
+        <string>3</string>
+    </array>
+
+    <!-- Run every night at 2:00 AM -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/joshuakao/anacare_03.20</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/joshuakao/anacare_03.20/logs/ralph-nightly-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/joshuakao/anacare_03.20/logs/ralph-nightly-stderr.log</string>
+
+    <!-- Ensure PATH includes claude CLI and homebrew -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/joshuakao/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>

@@ -1,0 +1,70 @@
+## AnaCare Progress Log
+
+---
+
+### 2026-03-20 — M1–M4 Complete (38/38 tests passing)
+
+**Status:** M1–M4 fully implemented. Ready to wire to a real DB + Aetna MRF.
+
+---
+
+## Milestones
+
+| Milestone | Status | Notes |
+|---|---|---|
+| M0 — Advisor | Open | Non-code task |
+| M1 — MRF Pipeline | Complete | All 5 pipeline steps implemented |
+| M2 — OOP Engine | Complete | 14 unit tests, all pass |
+| M3 — Quality Layer | Complete | 40% coverage suppression rule enforced |
+| M4 — Ranking API | Complete | FastAPI app with all 4 endpoints |
+| M5 — Demo | Open | Needs real DB + Aetna MRF wired up |
+| M6 — Design Partner | Open | |
+| M7 — Expand Payers | Open | |
+| M8 — Claims Integration | Open | |
+
+---
+
+## What Was Built
+
+### Project Structure (WAT Framework)
+```
+tools/          12 Python tools covering the full pipeline
+workflows/      4 SOPs: MRF ingestion, OOP calc, quality scoring, ranking API
+api/            FastAPI application (main.py, db.py)
+tests/          38 unit tests (all passing)
+Makefile        Developer convenience targets
+```
+
+### Tools
+- fetch_mrf_index.py    — Download + validate Aetna MRF index JSON
+- stream_mrf_file.py    — ijson streaming, CPT filter, .jsonl output
+- parse_rates.py        — Normalize + deduplicate rate records
+- resolve_npi.py        — CMS NPI Registry lookup with resume support
+- load_rates_db.py      — Upsert rates + providers to PostgreSQL
+- schema.sql            — Full DB schema (providers, rates, quality_scores, ingestion_log)
+- compute_oop.py        — Deductible/coinsurance/OOP-max formula + range mode
+- fetch_quality_cms.py  — CMS Provider Data Catalog API
+- score_quality.py      — Weighted quality index, 40% coverage suppression
+- map_cpt.py            — Claude API NL->CPT mapping
+- rank_providers.py     — Percentile-rank composite scoring
+- format_output.py      — API response serialization + disclaimer
+- geocode.py            — Haversine distance + zip radius filter
+- download_zip_data.py  — Census ZCTA centroid downloader (run once)
+
+### API Endpoints
+- POST /oauth/token         — Sandbox token
+- POST /v1/cpt-lookup       — NL procedure -> CPT candidates via Claude
+- POST /v1/rank-providers   — Core ranking query
+- GET  /v1/providers/{npi}  — Single provider detail
+- GET  /v1/health           — Health check
+
+---
+
+## Next Steps (M5 Demo)
+
+1. Provision Aurora PostgreSQL, set DB_* in .env, run: make schema
+2. Verify Aetna MRF index URL in .env, run: make pipeline-m1
+3. Run quality pipeline: make pipeline-m3
+4. Download zip data: make zip-data
+5. Set ANTHROPIC_API_KEY, start API: make api
+6. Validate with curl examples in workflows/ranking_api.md
