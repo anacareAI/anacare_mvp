@@ -3,6 +3,14 @@ set -euo pipefail
 
 cd /Users/joshuakao/anacare_03.20
 
+# Claude CLI uses ANTHROPIC_API_KEY from the environment — load gitignored .env if present
+if [ -f .env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+
 # Preflight
 command -v claude >/dev/null 2>&1 || { echo "ERROR: claude CLI not on PATH"; exit 1; }
 [ -f PRD.md ]       || { echo "ERROR: PRD.md missing"; exit 1; }
@@ -32,6 +40,9 @@ for ((i=1; i<=$MAX_ITERATIONS; i++)); do
   echo "Iteration $i of $MAX_ITERATIONS"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+  # claude must not run under bare `set -e` in command substitution — a non-zero exit
+  # would kill the script with no explanation. Capture exit code and stderr.
+  set +e
   result=$(claude --permission-mode acceptEdits -p \
     "@PRD.md @prd.json \
 
@@ -70,7 +81,18 @@ for ((i=1; i<=$MAX_ITERATIONS; i++)); do
     - If you cannot complete the story, set Status: FAILED and explain in Notes.
     - Do not modify PRD.md.
     - Keep changes small and focused.
-    - If all stories in prd.json have passes: true, output exactly: <promise>COMPLETE</promise>")
+    - If all stories in prd.json have passes: true, output exactly: <promise>COMPLETE</promise>" \
+    2>&1)
+  claude_exit=$?
+  set -e
+
+  if [ "$claude_exit" -ne 0 ]; then
+    echo "ERROR: claude CLI failed (exit $claude_exit). Output:" >&2
+    echo "$result" >&2
+    printf '\n--- Iteration %s CLAUDE-FAILED exit=%s ---\n%s\n---\n' \
+      "$i" "$claude_exit" "$result" >> "$LOG_FILE"
+    exit 1
+  fi
 
   echo "$result"
 

@@ -1,57 +1,6 @@
 # Agent Instructions
 
-## Primary Role: PRD Generation
-
-You are the AI backbone of a Telegram bot for AnaCare. Your job is to convert natural language feature requests into a valid `prd.json` file at `/Users/joshuakao/anacare_03.20/prd.json`.
-
-**WHEN A USER MESSAGE COMES IN:**
-Read the incoming natural language request. It will describe a feature, procedure, fix, or task to build inside anacare_product.
-Your job is to:
-1. Think carefully about what is actually being asked
-2. Break it into the smallest possible self-contained user stories — each one completable in a single AI context window
-3. Write a valid `prd.json` to `/Users/joshuakao/anacare_03.20/prd.json`
-
-**PRD.JSON FORMAT — write the file in exactly this structure:**
-```json
-{
-  "branchName": "kebab-case-feature-name",
-  "userStories": [
-    {
-      "id": "1",
-      "title": "Short title of what gets built",
-      "description": "Specific description of what to implement. Be precise. Reference file paths, function names, and expected behavior.",
-      "acceptanceCriteria": [
-        "Criterion 1 — observable, testable outcome",
-        "Criterion 2 — observable, testable outcome"
-      ],
-      "passes": false
-    }
-  ]
-}
-```
-
-**RULES FOR GOOD STORIES:**
-- Each story must be completable in one context window — if in doubt, split it
-- Stories must be ordered by dependency — foundational work first
-- `acceptanceCriteria` must be concrete and checkable, not vague
-- `branchName` must be lowercase, hyphenated, descriptive
-- Never set `passes` to `true` — Ralph sets that
-- Description must be specific enough that an AI with no prior context can implement it correctly
-
-BAD story: "Add authentication"
-GOOD story: "Add JWT middleware to Express server that validates Bearer tokens on all /api routes and returns 401 on failure"
-
-**CONTEXT:**
-- The target codebase is `anacare_product` (located at `/Users/joshuakao/anacare_product`)
-- Always write `prd.json` to `/Users/joshuakao/anacare_03.20/prd.json` using absolute path
-- Never modify `claude-code-telegram` code as part of a user feature request
-- Once `prd.json` is written, your job is done — Ralph handles execution
-
----
-
-## WAT Framework (Background Context)
-
-You're also working inside the **WAT framework** (Workflows, Agents, Tools). This architecture separates concerns so that probabilistic AI handles reasoning while deterministic code handles execution. That separation is what makes this system reliable.
+You're working inside the **WAT framework** (Workflows, Agents, Tools). This architecture separates concerns so that probabilistic AI handles reasoning while deterministic code handles execution. That separation is what makes this system reliable.
 
 ## The WAT Architecture
 
